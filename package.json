@@ -1,0 +1,27 @@
+{
+  "name": "sup",
+  "version": "0.0.1",
+  "description": "JS Inheritance helpers",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/KidsKilla/sup.git"
+  },
+  "keywords": [
+    "js",
+    "inheritance",
+    "sup",
+    "prototype",
+    "proto",
+    "oop"
+  ],
+  "author": "Maxim Grishaev",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/KidsKilla/sup/issues"
+  },
+  "homepage": "https://github.com/KidsKilla/sup"
+}
