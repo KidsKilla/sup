@@ -6,7 +6,30 @@ JS Inheritance helpers
 Примеры
 ===
 
-Допустим нам нужно насделоваться от какого-то класса:
+Допустим нам нужно насделоваться от какого-то класса `Foo`:
+
+```javascript
+// my simple class
+function Foo () {
+    this._foo = 'FOO';
+}
+
+Foo.prototype = {
+    get prop () {
+        return this._foo;
+    }
+};
+
+Foo.prototype.getTag = function () {
+    return '<foo>' + this.prop + '</foo>';
+};
+
+var foo = new Foo;
+console.log('foo', foo.getTag());
+// "foo" "<foo>FOO</foo>"
+```
+
+С помощью `sup` это можно сделать так:
 
 ```javascript
 var SUP = require('sup');
@@ -16,16 +39,33 @@ function Bar () {
 SUP.sup(Bar, Foo);
 ```
 
+или мы можем установить его в родительский класс, тогда у него появятся статические методы:
+  * `inherit`
+  * `extendPrototype`
+  * `getter`, `setter`, `desc`
+Это помогает убрать изо всех дочерних файлов запрос `var SUP = require('sup')`.
+
+```javascript
+// где-то в foo.js
+SUP.install(Foo);
+
+// где-то в bar.js
+Foo.inherit(Bar);
+
+// или даже
+SUP.install(Foo).inherit(Bar);
+```
 
 
-Теперь у дочернего класса есть новые статические св-ва, при помощи которых переопределение упрощается:
+Теперь у дочернего класса есть новые статические св-ва, при помощи которых доопределение упрощается:
   * `Sup` - конструктор родительского класса
   * `sup` - прототип родительского класса
 
 ```javascript
 function Bar () {
-    // do cool
+    this.doStuff();
     Bar.Sup.call(this);
+    this.doMoreStuff();
 }
 Foo.inherit(Bar);
 
@@ -40,11 +80,6 @@ console.log('bar', bar.getTag());
 ```
 
 
-
-Так же, в родительском классе мы можем установить `Sup`, тогда у класса появятся статические методы:
-  * `inherit`
-  * `extendPrototype`
-  * `getter`, `setter`, `desc`
 
 ```javascript
 // my simple class
@@ -110,15 +145,16 @@ console.log('baz1', baz1.getTag());
 
 
 Можно расширять прототип в объектной нотации.
-Есть статические методы-помощники для геттеров/сеттеров. Их легко можно доопределять:
+Есть статические методы-помощники `getter`, `setter`, `desc` для геттеров/сеттеров.
+Их легко доопределять:
 
 ```javascript
-// you can create class from prototype object
 var Baz2 = Bar.inherit(function fn () {
     fn.Sup.call(this);
     this._baz = 'BAZ 2';
 });
 
+// you can extend class from with object
 Baz2.extendPrototype({
     // getters supported
     get prop () {
