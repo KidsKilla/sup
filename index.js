@@ -1,61 +1,76 @@
 exports.sup = sup;
-exports.supProto = supProto;
+exports.install = install;
 
 /**
  * Inheritance method
  *
- * @param {Function} Ctor constructor to extend
- * @param {Function} Super super constructor
+ * @param {Function} Class constructor to extend
+ * @param {Function} SuperClass super constructor
  * @returns {Function}
  */
-function sup (Ctor, Super) {
-    let ctorProto = Ctor.prototype;
+function sup (Class, SuperClass) {
+    if (!Class) {
+        Class = function ctor () {
+            ctor.Sup.apply(this, arguments);
+        };
+    }
 
-    Ctor.Sup = Super;
-    Ctor.sup = Super.prototype;
-    Ctor.prototype = Object.create(Super.prototype, {
+    let prevProto = Class.prototype;
+    Class.Sup = SuperClass;
+    Class.sup = SuperClass.prototype;
+    Class.prototype = Object.create(SuperClass.prototype, {
         constructor: {
-            value: Ctor,
+            value: Class,
             enumerable: false,
             writable: true,
             configurable: true
         }
     });
 
-    Ctor.sup = function (Child) {
-        return sup(Child, Ctor);
-    };
-
-    Ctor.supProto = function (proto) {
-        return supProto(Ctor, proto);
-    };
-
+    install(Class);
     // Reassign methods
-    if (ctorProto) {
-        Object.keys(ctorProto).forEach(function (key) {
-            // for get/set
-            let desc = Object.getOwnPropertyDescriptor(ctorProto, key);
-            Object.defineProperty(Ctor.prototype, key, desc);
-        });
-    }
-
-    return Ctor;
+    prevProto && Class.extendPrototype(prevProto);
+    return Class;
 }
 
-/**
- *
- * @param {Function} Super
- * @param {Object} proto
- * @return {Function}
- */
-function supProto (Super, proto) {
-    let Ctor = proto.constructor || ctor;
-    Ctor.prototype = proto;
-
-    return sup(Ctor, Super);
-
-    function ctor () {
-        ctor.Sup.apply(this, arguments);
-    }
+function extendProto (proto, methods) {
+    Object.keys(methods).forEach(function (key) {
+        if (key === 'constructor') {
+            return;
+        }
+        // for getters/setters
+        let desc = Object.getOwnPropertyDescriptor(methods, key);
+        Object.defineProperty(proto, key, desc);
+    });
 }
 
+function install (Class) {
+    Class.inherit = function (Child) {
+        return sup(Child, Class);
+    };
+
+    Class.extendPrototype = function (proto) {
+        extendProto(Class.prototype, proto) ;
+        return Class;
+    };
+
+    Class.desc = function (name) {
+        return getDescriptor(Class.prototype, name);
+    };
+
+    Class.getter = function (name) {
+        return Class.desc(name).get;
+    };
+
+    Class.setter = function (name) {
+        return Class.desc(name).set;
+    };
+}
+
+var getDescriptor = Object['getPropertyDescriptor'] || function (subject, name) {
+    var pd;
+    do {
+        pd = Object.getOwnPropertyDescriptor(subject, name);
+    } while (!pd && (subject = Object.getPrototypeOf(subject)));
+    return pd;
+};
