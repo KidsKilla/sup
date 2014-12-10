@@ -9,10 +9,11 @@ JS Inheritance helpers
 Допустим нам нужно насделоваться от какого-то класса:
 
 ```javascript
+var SUP = require('sup');
 function Bar () {
     // ...
 }
-exports.sup(Bar, Foo);
+SUP.sup(Bar, Foo);
 ```
 
 
@@ -51,7 +52,7 @@ function Foo () {
     this._foo = 'FOO';
 }
 // exports is like `require('sup');`
-exports.install(Foo);
+SUP.install(Foo);
 
 Foo.prototype = {
     get prop () {
