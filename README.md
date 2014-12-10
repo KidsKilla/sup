@@ -50,10 +50,10 @@ SUP.sup(Bar, Foo);
 SUP.install(Foo);
 
 // где-то в bar.js
-Foo.inherit(Bar);
+Foo.inheritWith(Bar);
 
 // или даже
-SUP.install(Foo).inherit(Bar);
+SUP.install(Foo).inheritWith(Bar);
 ```
 
 
@@ -67,7 +67,7 @@ function Bar () {
     Bar.Sup.call(this);
     this.doMoreStuff();
 }
-Foo.inherit(Bar);
+Foo.inheritWith(Bar);
 
 // Initial inheitance
 Bar.prototype.getTag = function () {
@@ -110,7 +110,7 @@ console.log('foo', foo.getTag());
 
 ```javascript
 // My child class should be inherited
-var Bar = Foo.inherit();
+var Bar = Foo.inheritWith();
 
 // Initial inheitance
 Bar.prototype.getTag = function () {
@@ -136,7 +136,7 @@ Baz1.prototype.getTag = function () {
     return '<baz1>' + Baz1.sup.getTag.call(this) + '</baz1>' + this.prop
 };
 
-Bar.inherit(Baz1);
+Bar.inheritWith(Baz1);
 
 var baz1 = new Baz1;
 console.log('baz1', baz1.getTag());
@@ -149,7 +149,7 @@ console.log('baz1', baz1.getTag());
 Их легко доопределять:
 
 ```javascript
-var Baz2 = Bar.inherit(function fn () {
+var Baz2 = Bar.inheritWith(function fn () {
     fn.Sup.call(this);
     this._baz = 'BAZ 2';
 });

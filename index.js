@@ -45,7 +45,7 @@ function extendProto (proto, methods) {
 }
 
 function install (Class) {
-    Class.inherit = function (Child) {
+    Class.inheritWith = function (Child) {
         return sup(Child, Class);
     };
 
