@@ -6,37 +6,37 @@ JS Inheritance helpers
 Примеры
 ===
 
-Допустим нам нужно насделоваться от какого-то класса `Foo`:
+Допустим нам нужно насделоваться от какого-то класса `AAA`:
 
 ```javascript
 // my simple class
-function Foo () {
-    this._foo = 'FOO';
+function AAA () {
+    this._aaa = 'AAA';
 }
 
-Foo.prototype = {
+AAA.prototype = {
     get prop () {
-        return this._foo;
+        return this._aaa;
     }
 };
 
-Foo.prototype.getTag = function () {
-    return '<foo>' + this.prop + '</foo>';
+AAA.prototype.getTag = function () {
+    return '<aaa>' + this.prop + '</aaa>';
 };
 
-var foo = new Foo;
-console.log('foo', foo.getTag());
-// "foo" "<foo>FOO</foo>"
+var aaa = new AAA;
+console.log('aaa', aaa.getTag());
+// "aaa" "<aaa>AAA</aaa>"
 ```
 
 С помощью `sup` это можно сделать так:
 
 ```javascript
 var SUP = require('sup');
-function Bar () {
+function BBB () {
     // ...
 }
-SUP.sup(Bar, Foo);
+SUP.sup(BBB, AAA);
 ```
 
 или мы можем установить его в родительский класс, тогда у него появятся статические методы:
@@ -46,14 +46,14 @@ SUP.sup(Bar, Foo);
 Это помогает убрать изо всех дочерних файлов запрос `var SUP = require('sup')`.
 
 ```javascript
-// где-то в foo.js
-SUP.install(Foo);
+// где-то в aaa.js
+SUP.install(AAA);
 
 // где-то в bar.js
-Foo.inheritWith(Bar);
+AAA.inheritWith(BBB);
 
 // или даже
-SUP.install(Foo).inheritWith(Bar);
+SUP.install(AAA).inheritWith(BBB);
 ```
 
 
@@ -62,46 +62,50 @@ SUP.install(Foo).inheritWith(Bar);
   * `sup` - прототип родительского класса
 
 ```javascript
-function Bar () {
-    this.doStuff();
-    Bar.Sup.call(this);
-    this.doMoreStuff();
+function AAA () {
+    this._aaa = 'AAA';
 }
-Foo.inheritWith(Bar);
+exports.install(AAA);
 
-// Initial inheitance
-Bar.prototype.getTag = function () {
-    return '<bar>' + Bar.sup.getTag.call(this) + '</bar>';
+AAA.prototype = {
+    get prop () {
+        return this._aaa;
+    }
 };
 
-var bar = new Bar;
-console.log('bar', bar.getTag());
-// "bar" "<bar><foo>FOO</foo></bar>"
+AAA.prototype.getTag = function () {
+    return '<aaa>' + this.prop + '</aaa>';
+};
+
+var aaa = new AAA;
+console.log('aaa', aaa.getTag());
+// "aaa" "<aaa>AAA</aaa>"
 ```
 
 
 
 ```javascript
 // my simple class
-function Foo () {
-    this._foo = 'FOO';
+function AAA () {
+    this._aaa = 'AAA';
 }
-// exports is like `require('sup');`
-SUP.install(Foo);
 
-Foo.prototype = {
+// exports is like `require('sup');`
+SUP.install(AAA);
+
+AAA.prototype = {
     get prop () {
-        return this._foo;
+        return this._aaa;
     }
 };
 
-Foo.prototype.getTag = function () {
-    return '<foo>' + this.prop + '</foo>';
+AAA.prototype.getTag = function () {
+    return '<aaa>' + this.prop + '</aaa>';
 };
 
-var foo = new Foo;
-console.log('foo', foo.getTag());
-// "foo" "<foo>FOO</foo>"
+var aaa = new AAA;
+console.log('aaa', aaa.getTag());
+// "bar" "<bar><aaa>AAA</aaa></bar>"
 ```
 
 
@@ -110,16 +114,16 @@ console.log('foo', foo.getTag());
 
 ```javascript
 // My child class should be inherited
-var Bar = Foo.inheritWith();
+var BBB = AAA.inheritWith();
 
 // Initial inheitance
-Bar.prototype.getTag = function () {
-    return '<bar>' + Bar.sup.getTag.call(this) + '</bar>';
+BBB.prototype.getTag = function () {
+    return '<bar>' + BBB.sup.getTag.call(this) + '</bar>';
 };
 
-var bar = new Bar;
+var bar = new BBB;
 console.log('bar', bar.getTag());
-// "bar" "<bar><foo>FOO</foo></bar>"
+// "bar" "<bar><aaa>AAA</aaa></bar>"
 ```
 
 
@@ -127,20 +131,20 @@ console.log('bar', bar.getTag());
 Указывать наследование можно уже *после* того, как в прототипе появились методы, они будут скопированы
 
 ```javascript
-function Baz1 () {
-    Baz1.Sup.call(this);
+function CCC () {
+    CCC.Sup.call(this);
     this._baz = 'BAZ 2';
 }
 
-Baz1.prototype.getTag = function () {
-    return '<baz1>' + Baz1.sup.getTag.call(this) + '</baz1>' + this.prop
+CCC.prototype.getTag = function () {
+    return '<ccc>' + CCC.sup.getTag.call(this) + '</ccc>' + this.prop
 };
 
-Bar.inheritWith(Baz1);
+BBB.inheritWith(CCC);
 
-var baz1 = new Baz1;
-console.log('baz1', baz1.getTag());
-// "baz1" "<baz1><bar><foo>FOO</foo></bar></baz1>" + FOO
+var ccc = new CCC;
+console.log('ccc', ccc.getTag());
+// "ccc" "<ccc><bar><aaa>AAA</aaa></bar></ccc>"
 ```
 
 
@@ -149,23 +153,22 @@ console.log('baz1', baz1.getTag());
 Их легко доопределять:
 
 ```javascript
-var Baz2 = Bar.inheritWith(function fn () {
+var DDD = BBB.inheritWith(function fn () {
     fn.Sup.call(this);
     this._baz = 'BAZ 2';
 });
 
 // you can extend class from with object
-Baz2.extendPrototype({
+DDD.extendPrototype({
     // getters supported
     get prop () {
-        return this._baz + ':' + Baz2.Sup.getter('prop').call(this);
+        return this._baz + ':' + DDD.Sup.getter('prop').call(this);
     },
     createTag: function () {
         return '<baz2>' + this.prop + '</baz2>';
     }
 });
 
-var baz2 = new Baz2;
-console.log('baz2', baz2.getTag());
-
+var ddd = new DDD;
+console.log('ddd', ddd.getTag());
 ```
