@@ -58,12 +58,12 @@ function install (Class) {
         return getDescriptor(Class.prototype, name);
     };
 
-    Class.getter = function (name) {
-        return Class.desc(name).get;
+    Class.getter = function (instance, name) {
+        return Class.prototype.__lookupGetter__(name);
     };
 
     Class.setter = function (name) {
-        return Class.desc(name).set;
+        return Class.prototype.__lookupSetter__(name);
     };
 }
 
