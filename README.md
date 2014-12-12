@@ -43,6 +43,7 @@ SUP.sup(BBB, AAA);
   * `inherit`
   * `extendPrototype`
   * `getter`, `setter`, `desc`
+
 Это помогает убрать изо всех дочерних файлов запрос типа `var SUP = require('sup')`.
 
 ```javascript
