@@ -1,21 +1,38 @@
-exports.sup = sup;
+'use strict';
+
 exports.install = install;
+
+exports.adopt = sup;
+
+exports.evolve = function (SuperClass, proto) {
+    var Child = sup(SuperClass);
+    extendProto(Child.prototype, proto);
+    return Child;
+};
+
+exports.getPropertyDescriptor = function (subject, name) {
+    var pd;
+    do {
+        pd = Object.getOwnPropertyDescriptor(subject, name);
+    } while (!pd && (subject = Object.getPrototypeOf(subject)));
+    return pd;
+};
 
 /**
  * Inheritance method
  *
- * @param {Function} Class constructor to extend
  * @param {Function} SuperClass super constructor
+ * @param {Function} Class constructor to extend
  * @returns {Function}
  */
-function sup (Class, SuperClass) {
+function sup (SuperClass, Class) {
+    var prevProto = Class && Class.prototype;
     if (!Class) {
         Class = function ctor () {
             ctor.Sup.apply(this, arguments);
         };
     }
 
-    let prevProto = Class.prototype;
     Class.Sup = SuperClass;
     Class.sup = SuperClass.prototype;
     Class.prototype = Object.create(SuperClass.prototype, {
@@ -29,7 +46,9 @@ function sup (Class, SuperClass) {
 
     install(Class);
     // Reassign methods
-    prevProto && Class.extendPrototype(prevProto);
+    if (prevProto) {
+        extendProto(Class.prototype, prevProto);
+    }
     return Class;
 }
 
@@ -39,38 +58,22 @@ function extendProto (proto, methods) {
             return;
         }
         // for getters/setters
-        let desc = Object.getOwnPropertyDescriptor(methods, key);
+        var desc = Object.getOwnPropertyDescriptor(methods, key);
         Object.defineProperty(proto, key, desc);
     });
 }
 
-function install (Class) {
-    Class.inheritWith = function (Child) {
-        return sup(Child, Class);
+function install (SuperClass) {
+    SuperClass.adopt = function (Child) {
+        return exports.adopt(SuperClass, Child);
     };
 
-    Class.extendPrototype = function (proto) {
-        extendProto(Class.prototype, proto) ;
-        return Class;
+    SuperClass.evolve = function (proto) {
+        return exports.evolve(SuperClass, proto);
     };
-
-    Class.desc = function (name) {
-        return getDescriptor(Class.prototype, name);
-    };
-
-    Class.getter = function (instance, name) {
-        return Class.prototype.__lookupGetter__(name);
-    };
-
-    Class.setter = function (name) {
-        return Class.prototype.__lookupSetter__(name);
+    
+    SuperClass.extendPrototype = function (proto) {
+        extendProto(SuperClass.prototype, proto);
+        return SuperClass;
     };
 }
-
-var getDescriptor = Object['getPropertyDescriptor'] || function (subject, name) {
-    var pd;
-    do {
-        pd = Object.getOwnPropertyDescriptor(subject, name);
-    } while (!pd && (subject = Object.getPrototypeOf(subject)));
-    return pd;
-};
